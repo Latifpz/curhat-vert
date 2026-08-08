@@ -768,19 +768,144 @@
 
             // --- 2. QUILL EDITOR INITIALIZATION (SOURCE 3) ---
             quill = new Quill('#editor', {
-                theme: 'snow',
-                placeholder: 'Tuliskan jawaban atau cerita refleksi Anda di sini secara jujur...',
-                modules: {
-                    toolbar: [
-                        ['bold', 'italic', 'underline'],
-                        [{ 'color': [] }, { 'background': [] }],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        ['clean']
-                    ]
-                }
-            });
+    theme: 'snow',
 
-            updateOfflineCount();
+    placeholder: 'Tuliskan jawaban atau cerita refleksi Anda di sini secara jujur...',
+
+    modules: {
+        toolbar: {
+            container: [
+                ['bold', 'italic', 'underline'],
+
+                [{ 'color': [] }, { 'background': [] }],
+
+                [
+                    { 'list': 'ordered' },
+                    { 'list': 'bullet' }
+                ],
+
+                // 🖼️ TOMBOL TAMBAH GAMBAR
+                ['image'],
+
+                ['clean']
+            ],
+
+            handlers: {
+                image: function () {
+                    pilihGambar();
+                }
+            }
+        }
+    }
+});
+
+
+// =====================================================
+// FITUR TAMBAH GAMBAR
+// =====================================================
+
+function pilihGambar() {
+
+    const input = document.createElement('input');
+
+    input.type = 'file';
+
+    input.accept = 'image/*';
+
+    // Membuka galeri HP
+    input.click();
+
+
+    input.onchange = function () {
+
+        const file = input.files[0];
+
+        if (!file) return;
+
+
+        // Cek apakah file gambar
+        if (!file.type.startsWith('image/')) {
+
+            alert('File yang dipilih harus berupa gambar!');
+
+            return;
+        }
+
+
+        // Maksimal 2 MB
+        if (file.size > 2 * 1024 * 1024) {
+
+            alert('Ukuran gambar maksimal 2 MB.');
+
+            return;
+        }
+
+
+        const reader = new FileReader();
+
+
+        reader.onload = function (event) {
+
+            let range = quill.getSelection(true);
+
+
+            if (!range) {
+
+                range = {
+                    index: quill.getLength(),
+                    length: 0
+                };
+
+            }
+
+
+            // Masukkan gambar ke editor
+            quill.insertEmbed(
+                range.index,
+                'image',
+                event.target.result,
+                'user'
+            );
+
+
+            // Pindahkan kursor setelah gambar
+            quill.setSelection(
+                range.index + 1,
+                0
+            );
+
+        };
+
+
+        reader.readAsDataURL(file);
+
+    };
+
+}
+
+
+// =====================================================
+// AGAR GAMBAR RESPONSIF
+// =====================================================
+
+const imageStyle = document.createElement('style');
+
+imageStyle.innerHTML = `
+
+    #editor img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 12px auto;
+        border-radius: 10px;
+    }
+
+`;
+
+document.head.appendChild(imageStyle);
+
+
+updateOfflineCount();
 
             // --- 3. DYNAMIC QUESTIONS & GAS FETCH (SOURCE 2 & 3) ---
             function renderQuestions() {
