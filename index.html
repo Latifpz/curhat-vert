@@ -1,0 +1,1010 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruang Refleksi & Cerita Siswa</title>
+    
+    <!-- Google Fonts Inter & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Quill.js Editor Styles & Script -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+    <style>
+        /* =========================================================
+           1. THEMING VARIABLES & CSS SYSTEM (SOURCE 2)
+           ========================================================= */
+        :root {
+            --bg-main: #0B1120;
+            --card-bg: #32372f;
+            --card-inner: #000105;
+            --primary-accent: #302525;
+            --primary-hover: #d6f9d8;
+            --text-title: #f5f7eb;
+            --text-heading: #FFFFFF;
+            --text-body: #94A3B8;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --glow-color: rgba(243, 245, 245, 0.15);
+        }
+
+        [data-theme="white"] {
+            --bg-main: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --card-inner: #F1F5F9;
+            --primary-accent: #475569;
+            --primary-hover: #334155;
+            --text-title: #0F172A;
+            --text-heading: #1E293B;
+            --text-body: #64748B;
+            --border-color: #E2E8F0;
+            --glow-color: rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="pink"] {
+            --bg-main: #180B14;
+            --card-bg: #271221;
+            --card-inner: #1F0D1A;
+            --primary-accent: #EC4899;
+            --primary-hover: #DB2777;
+            --text-title: #F472B6;
+            --text-heading: #FFFFFF;
+            --text-body: #FBCFE8;
+            --border-color: rgba(236, 72, 153, 0.2);
+            --glow-color: rgba(236, 72, 153, 0.2);
+        }
+
+        [data-theme="cyan"] {
+            --bg-main: #061727;
+            --card-bg: #0C2338;
+            --card-inner: #081B2C;
+            --primary-accent: #06B6D4;
+            --primary-hover: #0891B2;
+            --text-title: #38BDF8;
+            --text-heading: #FFFFFF;
+            --text-body: #A5F3FC;
+            --border-color: rgba(6, 182, 212, 0.2);
+            --glow-color: rgba(6, 182, 212, 0.2);
+        }
+
+        [data-theme="emerald"] {
+            --bg-main: #061812;
+            --card-bg: #0B291F;
+            --card-inner: #081E17;
+            --primary-accent: #10B981;
+            --primary-hover: #059669;
+            --text-title: #34D399;
+            --text-heading: #FFFFFF;
+            --text-body: #A7F3D0;
+            --border-color: rgba(16, 185, 129, 0.2);
+            --glow-color: rgba(16, 185, 129, 0.2);
+        }
+
+        [data-theme="orange"] {
+            --bg-main: #1C0F0A;
+            --card-bg: #2B1810;
+            --card-inner: #21120B;
+            --primary-accent: #F97316;
+            --primary-hover: #EA580C;
+            --text-title: #FB923C;
+            --text-heading: #FFFFFF;
+            --text-body: #FFEDD5;
+            --border-color: rgba(249, 115, 22, 0.2);
+            --glow-color: rgba(249, 115, 22, 0.2);
+        }
+
+        [data-theme="red"] {
+            --bg-main: #1A090B;
+            --card-bg: #2B1014;
+            --card-inner: #210C0F;
+            --primary-accent: #EF4444;
+            --primary-hover: #DC2626;
+            --text-title: #F87171;
+            --text-heading: #FFFFFF;
+            --text-body: #FCA5A5;
+            --border-color: rgba(239, 68, 68, 0.2);
+            --glow-color: rgba(239, 68, 68, 0.2);
+        }
+
+        [data-theme="amber"] {
+            --bg-main: #181205;
+            --card-bg: #291F0B;
+            --card-inner: #201808;
+            --primary-accent: #F59E0B;
+            --primary-hover: #D97706;
+            --text-title: #FBBF24;
+            --text-heading: #FFFFFF;
+            --text-body: #FDE68A;
+            --border-color: rgba(245, 158, 11, 0.2);
+            --glow-color: rgba(245, 158, 11, 0.2);
+        }
+
+        /* =========================================================
+           2. BASE STYLES & LAYOUT
+           ========================================================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-heading);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .top-bar-line {
+            height: 3px;
+            width: 100%;
+            background: linear-gradient(90deg, #6366F1, #EC4899, #06B6D4, #10B981, #F97316, #EF4444, #F59E0B);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 5%;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-title);
+        }
+
+        .brand i { color: #F59E0B; }
+
+        .theme-selector {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            padding: 6px 16px;
+            border-radius: 30px;
+        }
+
+        .theme-selector span {
+            font-size: 0.85rem;
+            color: var(--text-body);
+        }
+
+        .color-options {
+            display: flex;
+            gap: 8px;
+        }
+
+        .color-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .color-dot:hover { transform: scale(1.2); }
+        .color-dot.active {
+            border-color: #FFFFFF;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+            transform: scale(1.15);
+        }
+
+        .dot-default { background-color: #0B1120; border: 1px solid #334155; }
+        .dot-white { background-color: #FFFFFF; }
+        .dot-pink { background-color: #EC4899; }
+        .dot-cyan { background-color: #06B6D4; }
+        .dot-emerald { background-color: #10B981; }
+        .dot-orange { background-color: #F97316; }
+        .dot-red { background-color: #EF4444; }
+        .dot-amber { background-color: #F59E0B; }
+
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        .card-container {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 650px;
+            padding: 40px 32px;
+            box-shadow: 0 20px 40px var(--glow-color);
+            text-align: center;
+            position: relative;
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-title);
+            margin-bottom: 8px;
+        }
+
+        .card-subtitle {
+            color: var(--text-body);
+            font-size: 0.95rem;
+            margin-bottom: 24px;
+        }
+
+        .guarantee-box {
+            background-color: var(--card-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px;
+            text-align: left;
+            margin-bottom: 24px;
+        }
+
+        .guarantee-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-title);
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+        }
+
+        .guarantee-text {
+            color: var(--text-body);
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        .btn-action {
+            width: 100%;
+            background-color: var(--primary-accent);
+            color: #FFFFFF;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px var(--glow-color);
+            transition: all 0.2s ease;
+        }
+
+        .btn-action:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-action:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background-color: var(--card-inner);
+            border: 1px solid var(--border-color);
+            color: var(--text-body);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-heading);
+        }
+
+        .offline-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #FBBF24;
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+        }
+
+        .offline-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #FBBF24;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+
+        /* =========================================================
+           3. MODALS & QUILL EDITOR STYLES
+           ========================================================= */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 100;
+            padding: 15px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px 28px;
+            width: 100%;
+            max-width: 580px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px var(--glow-color);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            color: var(--text-title);
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            color: var(--text-body);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+            text-align: left;
+            flex: 1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text-heading);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--card-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-heading);
+            font-size: 0.88rem;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-accent);
+        }
+
+        /* Dynamic Questions Box */
+        .questions-box {
+            background: var(--card-inner);
+            border-left: 3px solid var(--primary-accent);
+            border-radius: 0 8px 8px 0;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .questions-header {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-title);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .questions-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .questions-list li {
+            font-size: 0.88rem;
+            color: var(--text-heading);
+            margin-bottom: 6px;
+            line-height: 1.4;
+            display: flex;
+            gap: 8px;
+        }
+
+        .questions-list li i {
+            color: var(--primary-accent);
+            margin-top: 3px;
+        }
+
+        /* Quill Editor Styling Override */
+        .ql-toolbar.ql-snow {
+            background: var(--card-inner);
+            border-color: var(--border-color) !important;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        .ql-container.ql-snow {
+            background: #FFFFFF;
+            color: #1E293B;
+            border-color: var(--border-color) !important;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            min-height: 150px;
+            font-size: 0.9rem;
+        }
+
+        .ql-snow .ql-stroke { stroke: var(--text-body); }
+        .ql-snow .ql-fill { fill: var(--text-body); }
+        .ql-snow .ql-picker { color: var(--text-body); }
+
+        /* =========================================================
+           4. FOOTER & ADMIN CONTROL
+           ========================================================= */
+        footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 5%;
+            font-size: 0.85rem;
+            color: var(--text-body);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-admin-trigger {
+            background: none;
+            border: none;
+            color: var(--text-body);
+            cursor: pointer;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+
+        .btn-admin-trigger:hover {
+            color: var(--text-heading);
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar-line"></div>
+
+    <!-- Header Navbar -->
+    <header>
+        <div class="brand">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>Ruang Refleksi</span>
+        </div>
+
+        <div class="theme-selector">
+            <span>Tema:</span>
+            <div class="color-options">
+                <div class="color-dot dot-default active" data-theme="default" title="Navy"></div>
+                <div class="color-dot dot-white" data-theme="white" title="White"></div>
+                <div class="color-dot dot-pink" data-theme="pink" title="Pink"></div>
+                <div class="color-dot dot-cyan" data-theme="cyan" title="Cyan"></div>
+                <div class="color-dot dot-emerald" data-theme="emerald" title="Emerald"></div>
+                <div class="color-dot dot-orange" data-theme="orange" title="Orange"></div>
+                <div class="color-dot dot-red" data-theme="red" title="Red"></div>
+                <div class="color-dot dot-amber" data-theme="amber" title="Amber"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Section -->
+    <main>
+        <div class="card-container">
+            <!-- Offline Indicator Badge -->
+            <div id="offline-badge" class="offline-badge hidden">
+                <span class="offline-dot"></span> Mode Penyimpanan Lokal (Offline)
+            </div>
+
+            <h1 class="card-title">Ruang Refleksi & Cerita</h1>
+            <p class="card-subtitle">Sampaikan jawaban dan sudut pandangmu secara aman & bebas.</p>
+
+            <div class="guarantee-box">
+                <div class="guarantee-header">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>Jaminan Ruang Aman & Privasi</span>
+                </div>
+                <p class="guarantee-text">
+                    Jawaban di sini murni untuk mendengar suara dan pengalaman kamu secara pribadi. Tidak ada penilaian yang menghakimi. Ceritakan apa yang benar-benar kamu rasakan.
+                </p>
+            </div>
+
+            <button class="btn-action" id="btnStart">
+                <span>Saya siap mengisi dengan jujur & mandiri</span>
+                <i class="fa-solid fa-arrow-right" id="btnIcon"></i>
+            </button>
+        </div>
+    </main>
+
+    <!-- Modal Form Refleksi Multi-Step -->
+    <div class="modal-overlay" id="reflectionModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Form Refleksi Diri</h2>
+                <button class="btn-close" id="btnCloseModal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- STEP 1: IDENTITAS SISWA -->
+            <div id="step-identity">
+                <div class="guarantee-box" style="margin-bottom: 16px; background: rgba(99, 102, 241, 0.08);">
+                    <p class="guarantee-text" style="font-size: 0.83rem;">
+                        💡 <strong>Catatan Privasi:</strong> Identitas digunakan untuk pendataan internal guru. Jawabanmu bersifat rahasia dan tidak akan dipublikasikan ke teman-teman.
+                    </p>
+                </div>
+
+                <form id="formIdentity">
+                    <div class="form-group">
+                        <label for="nama">Nama Lengkap Saya *</label>
+                        <input type="text" id="nama" class="form-control" required placeholder="Contoh: Retno Ariyanti Nurningtias">
+                    </div>
+                    <div class="form-group">
+                        <label for="kelas">Kelas / Rombel *</label>
+                        <input type="text" id="kelas" class="form-control" required placeholder="Contoh: XI PPLG 1">
+                    </div>
+                    <button type="submit" class="btn-action" style="margin-top: 10px;">
+                        <span>Lanjut ke Pertanyaan</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- STEP 2: PERTANYAAN & RICH TEXT EDITOR -->
+            <div id="step-editor" class="hidden">
+                <div class="questions-box">
+                    <div class="questions-header">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <span>Pertanyaan Refleksi Kali Ini:</span>
+                    </div>
+                    <ul class="questions-list" id="questionsList">
+                        <li><i class="fa-solid fa-spinner fa-spin"></i> Memuat pertanyaan dari server...</li>
+                    </ul>
+                </div>
+
+                <div class="form-group">
+                    <label>Jawaban & Curahan Pikiranmu:</label>
+                    <div id="editor-wrapper">
+                        <div id="editor"></div>
+                    </div>
+                </div>
+
+                <div class="form-row" style="margin-top: 16px;">
+                    <button type="button" id="btnBackToIdentity" class="btn-action btn-secondary" style="flex: 1;">
+                        Kembali
+                    </button>
+                    <button type="button" id="btnSubmitAnswer" class="btn-action" style="flex: 2;">
+                        <span id="btnSubmitText">Kirim Cerita Refleksi</span>
+                        <i class="fa-solid fa-paper-plane" id="btnSubmitIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 3: SUCCESS STATE -->
+            <div id="step-success" class="hidden" style="text-align: center; padding: 20px 0;">
+                <div style="font-size: 3rem; color: #10B981; margin-bottom: 12px;">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <h3 style="color: var(--text-heading); font-size: 1.3rem; margin-bottom: 8px;">Jawaban Berhasil Terkirim!</h3>
+                <p style="color: var(--text-body); font-size: 0.9rem; line-height: 1.5; margin-bottom: 20px;">
+                    Terima kasih atas kejujuran dan keberanianmu bercerita. Jawaban ini tersimpan dengan aman dan hanya dibaca oleh Guru.
+                </p>
+                <button type="button" id="btnResetForm" class="btn-action btn-secondary" style="max-width: 200px; margin: 0 auto;">
+                    Selesai
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Admin Control Panel -->
+    <div class="modal-overlay" id="adminModal">
+        <div class="modal-card" style="max-width: 450px;">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fa-solid fa-gears"></i> Panel Kontrol Guru</h2>
+                <button class="btn-close" id="btnCloseAdminModal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Admin Authentication -->
+            <div id="adminAuth">
+                <div class="form-group">
+                    <label for="adminPin">Masukkan PIN Keamanan Guru:</label>
+                    <input type="password" id="adminPin" class="form-control" placeholder="">
+                </div>
+                <button type="button" id="btnLoginAdmin" class="btn-action">
+                    Masuk Panel Guru
+                </button>
+            </div>
+
+            <!-- Admin Settings Panel -->
+            <div id="adminPanel" class="hidden">
+                <div class="form-group">
+                    <label for="cfgGasUrl">URL Google Apps Script (Web App):</label>
+                    <input type="text" id="cfgGasUrl" class="form-control" style="font-size: 0.8rem; font-family: monospace;" placeholder="https://script.google.com/macros/s/.../exec">
+                </div>
+
+                <div class="form-group">
+                    <label for="cfgQuestions">Pertanyaan Aktif Offline (Satu per baris):</label>
+                    <textarea id="cfgQuestions" class="form-control" style="height: 90px; font-size: 0.85rem;" placeholder="Tuliskan pertanyaan di sini..."></textarea>
+                </div>
+
+                <button type="button" id="btnSaveConfig" class="btn-action" style="margin-bottom: 10px;">
+                    Simpan Pengaturan
+                </button>
+
+                <button type="button" id="btnExportOffline" class="btn-action btn-secondary" style="font-size: 0.85rem;">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Export Draft Offline</span>
+                    <span id="offlineCount" style="background: var(--primary-accent); color: #FFF; padding: 2px 6px; border-radius: 10px; font-size: 0.75rem;">0</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-left">
+            developer : <strong>RAN | 2026</strong>
+        </div>
+        <div class="footer-right">
+            <span>Ruang Refleksi Siswa - Aman & Terjaga</span>
+            <button class="btn-admin-trigger" id="btnOpenAdmin" title="Panel Guru">
+                <i class="fa-solid fa-lock"></i>
+            </button>
+        </div>
+    </footer>
+
+    <!-- =========================================================
+       5. INTEGRATED JAVASCRIPT LOGIC
+       ========================================================= -->
+    <script>
+        const DEFAULT_PIN = "1234";
+        let quill = null;
+        let questionsList = [
+            "Bagaimana perasaanmu saat belajar di kelas hari ini?",
+            "Ceritakan pengalaman atau pandangan pribadimu tentang suasana kelas secara jujur."
+        ];
+
+        // Retrieve Configurations from LocalStorage
+        let gasUrl = localStorage.getItem("APP_GAS_URL") || "https://script.google.com/macros/s/AKfycbzUDDTELEPLEaH1vWvLXJ7LgR_mchgC2dw6wcb2ScKRVUfG9YcEIBZtwEoWh7aneQay/exec";
+        const savedCustomQuestions = localStorage.getItem("APP_QUESTIONS");
+        if (savedCustomQuestions) {
+            try { questionsList = JSON.parse(savedCustomQuestions); } catch(e){}
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- 1. THEME SWITCHER LOGIC (SOURCE 2) ---
+            const colorDots = document.querySelectorAll('.color-dot');
+            const htmlElement = document.documentElement;
+
+            function applyTheme(themeName) {
+                if (themeName === 'default') {
+                    htmlElement.removeAttribute('data-theme');
+                } else {
+                    htmlElement.setAttribute('data-theme', themeName);
+                }
+                colorDots.forEach(dot => {
+                    dot.classList.toggle('active', dot.getAttribute('data-theme') === themeName);
+                });
+                localStorage.setItem('selectedTheme', themeName);
+            }
+
+            const savedTheme = localStorage.getItem('selectedTheme') || 'default';
+            applyTheme(savedTheme);
+
+            colorDots.forEach(dot => {
+                dot.addEventListener('click', () => applyTheme(dot.getAttribute('data-theme')));
+            });
+
+            // --- 2. QUILL EDITOR INITIALIZATION (SOURCE 3) ---
+            quill = new Quill('#editor', {
+                theme: 'snow',
+                placeholder: 'Tuliskan jawaban atau cerita refleksi Anda di sini secara jujur...',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['clean']
+                    ]
+                }
+            });
+
+            updateOfflineCount();
+
+            // --- 3. DYNAMIC QUESTIONS & GAS FETCH (SOURCE 2 & 3) ---
+            function renderQuestions() {
+                const listEl = document.getElementById('questionsList');
+                listEl.innerHTML = '';
+                questionsList.forEach(q => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<i class="fa-solid fa-circle-question"></i> <span>${sanitizeHTML(q)}</span>`;
+                    listEl.appendChild(li);
+                });
+            }
+
+            async function fetchQuestionsFromGAS() {
+              // Jika gasUrl kosong, langsung tampilkan pertanyaan lokal
+              if (!gasUrl) {
+                  renderQuestions();
+                  return;
+              }
+              
+              try {
+                  // Menggunakan mode 'cors' dan penanganan timeout
+                  const response = await fetch(gasUrl, { method: 'GET' });
+                  if (response.ok) {
+                      const result = await response.json();
+                      if (result.status === 'success' && Array.isArray(result.data) && result.data.length > 0) {
+                          questionsList = result.data;
+                      }
+                  }
+              } catch (error) {
+                  console.warn("Koneksi ke Apps Script gagal/ditiadakan CORS, menggunakan soal default:", error);
+                  // Tampilkan indikator offline jika ada kendala
+                  const badge = document.getElementById('offline-badge');
+                  if (badge) badge.classList.remove('hidden');
+              } finally {
+                  // PERBAIKAN UTAMA: Selalu panggil renderQuestions() apapun yang terjadi
+                  renderQuestions();
+              }
+          }
+
+            // --- 4. STEP MODAL NAVIGATION & SUBMISSION ---
+            const modal = document.getElementById('reflectionModal');
+            const btnStart = document.getElementById('btnStart');
+            const btnIcon = document.getElementById('btnIcon');
+            const btnCloseModal = document.getElementById('btnCloseModal');
+            const formIdentity = document.getElementById('formIdentity');
+            const stepIdentity = document.getElementById('step-identity');
+            const stepEditor = document.getElementById('step-editor');
+            const stepSuccess = document.getElementById('step-success');
+            const btnBackToIdentity = document.getElementById('btnBackToIdentity');
+            const btnSubmitAnswer = document.getElementById('btnSubmitAnswer');
+            const btnResetForm = document.getElementById('btnResetForm');
+
+            btnStart.addEventListener('click', () => {
+                btnIcon.className = "fa-solid fa-circle-notch fa-spin";
+                setTimeout(() => {
+                    btnIcon.className = "fa-solid fa-arrow-right";
+                    modal.classList.add('active');
+                    showStep('identity');
+                }, 250);
+            });
+
+            btnCloseModal.addEventListener('click', () => modal.classList.remove('active'));
+
+            function showStep(stepName) {
+                stepIdentity.classList.add('hidden');
+                stepEditor.classList.add('hidden');
+                stepSuccess.classList.add('hidden');
+
+                if (stepName === 'identity') {
+                    stepIdentity.classList.remove('hidden');
+                } else if (stepName === 'editor') {
+                    stepEditor.classList.remove('hidden');
+                    fetchQuestionsFromGAS();
+                } else if (stepName === 'success') {
+                    stepSuccess.classList.remove('hidden');
+                }
+            }
+
+            formIdentity.addEventListener('submit', (e) => {
+                e.preventDefault();
+                showStep('editor');
+            });
+
+            btnBackToIdentity.addEventListener('click', () => showStep('identity'));
+
+            // Submit Handler (Online GAS + Offline LocalStorage Fallback)
+            btnSubmitAnswer.addEventListener('click', async () => {
+                const nama = document.getElementById('nama').value.trim();
+                const kelas = document.getElementById('kelas').value.trim();
+                const rawText = quill.getText().trim();
+                const htmlAnswer = quill.root.innerHTML;
+
+                if (!rawText || rawText.length < 2) {
+                    alert("Mohon isi jawaban atau cerita refleksi Anda terlebih dahulu.");
+                    return;
+                }
+
+                setSubmitLoading(true);
+
+                const payload = {
+                    nama: nama,
+                    kelas: kelas,
+                    jawaban_html: htmlAnswer,
+                    timestamp: new Date().toLocaleString('id-ID'),
+                    user_agent: navigator.userAgent
+                };
+
+                if (!gasUrl) {
+                    saveToLocalStorage(payload);
+                    setTimeout(() => {
+                        setSubmitLoading(false);
+                        showStep('success');
+                    }, 500);
+                    return;
+                }
+
+                try {
+                    await fetch(gasUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    showStep('success');
+                } catch (error) {
+                    console.warn("Gagal mengirim ke GAS, mengamankan ke LocalStorage:", error);
+                    saveToLocalStorage(payload);
+                    document.getElementById('offline-badge').classList.remove('hidden');
+                    showStep('success');
+                } finally {
+                    setSubmitLoading(false);
+                }
+            });
+
+            btnResetForm.addEventListener('click', () => {
+                formIdentity.reset();
+                quill.setContents([]);
+                modal.classList.remove('active');
+            });
+
+            function setSubmitLoading(isLoading) {
+                const btnSubmitText = document.getElementById('btnSubmitText');
+                const btnSubmitIcon = document.getElementById('btnSubmitIcon');
+                btnSubmitAnswer.disabled = isLoading;
+                if (isLoading) {
+                    btnSubmitText.textContent = "Mengirim...";
+                    btnSubmitIcon.className = "fa-solid fa-spinner fa-spin";
+                } else {
+                    btnSubmitText.textContent = "Kirim Cerita Refleksi";
+                    btnSubmitIcon.className = "fa-solid fa-paper-plane";
+                }
+            }
+
+            function saveToLocalStorage(data) {
+                const existing = JSON.parse(localStorage.getItem("OFFLINE_DRAFTS") || "[]");
+                existing.push(data);
+                localStorage.setItem("OFFLINE_DRAFTS", JSON.stringify(existing));
+                updateOfflineCount();
+            }
+
+            function updateOfflineCount() {
+                const existing = JSON.parse(localStorage.getItem("OFFLINE_DRAFTS") || "[]");
+                document.getElementById('offlineCount').innerText = existing.length;
+            }
+
+            // --- 5. ADMIN CONTROL PANEL (SOURCE 3) ---
+            const adminModal = document.getElementById('adminModal');
+            const btnOpenAdmin = document.getElementById('btnOpenAdmin');
+            const btnCloseAdminModal = document.getElementById('btnCloseAdminModal');
+            const btnLoginAdmin = document.getElementById('btnLoginAdmin');
+            const adminAuth = document.getElementById('adminAuth');
+            const adminPanel = document.getElementById('adminPanel');
+            const btnSaveConfig = document.getElementById('btnSaveConfig');
+            const btnExportOffline = document.getElementById('btnExportOffline');
+
+            btnOpenAdmin.addEventListener('click', () => adminModal.classList.add('active'));
+            btnCloseAdminModal.addEventListener('click', () => adminModal.classList.remove('active'));
+
+            btnLoginAdmin.addEventListener('click', () => {
+                const pin = document.getElementById('adminPin').value;
+                if (pin === DEFAULT_PIN) {
+                    adminAuth.classList.add('hidden');
+                    adminPanel.classList.remove('hidden');
+                    document.getElementById('cfgGasUrl').value = gasUrl;
+                    document.getElementById('cfgQuestions').value = questionsList.join("\n");
+                } else {
+                    alert("PIN Admin Salah!");
+                }
+            });
+
+            btnSaveConfig.addEventListener('click', () => {
+                gasUrl = document.getElementById('cfgGasUrl').value.trim();
+                const textQ = document.getElementById('cfgQuestions').value.trim();
+
+                localStorage.setItem("APP_GAS_URL", gasUrl);
+                if (textQ) {
+                    questionsList = textQ.split("\n").filter(q => q.trim().length > 0);
+                    localStorage.setItem("APP_QUESTIONS", JSON.stringify(questionsList));
+                }
+                renderQuestions();
+                alert("Pengaturan Guru berhasil disimpan!");
+                adminModal.classList.remove('active');
+            });
+
+            btnExportOffline.addEventListener('click', () => {
+                const existing = localStorage.getItem("OFFLINE_DRAFTS");
+                if (!existing || existing === "[]") {
+                    alert("Tidak ada draft jawaban offline.");
+                    return;
+                }
+                const blob = new Blob([existing], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `backup_refleksi_siswa_${Date.now()}.json`;
+                a.click();
+            });
+
+            function sanitizeHTML(str) {
+                const temp = document.createElement('div');
+                temp.textContent = str;
+                return temp.innerHTML;
+            }
+        });
+    </script>
+</body>
+</html>
