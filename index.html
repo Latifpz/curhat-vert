@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -500,6 +499,29 @@
         .ql-snow .ql-fill { fill: var(--text-body); }
         .ql-snow .ql-picker { color: var(--text-body); }
 
+        /* Image upload status indicator */
+        .img-upload-status {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-body);
+            margin-top: 6px;
+            padding: 6px 10px;
+            background: var(--card-inner);
+            border-radius: 6px;
+        }
+
+        .img-upload-status.active {
+            display: flex;
+        }
+
+        .img-count-badge {
+            font-size: 0.75rem;
+            color: var(--text-body);
+            margin-top: 4px;
+        }
+
         /* =========================================================
            4. FOOTER & ADMIN CONTROL
            ========================================================= */
@@ -638,6 +660,11 @@
                     <div id="editor-wrapper">
                         <div id="editor"></div>
                     </div>
+                    <div class="img-upload-status" id="imgUploadStatus">
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                        <span id="imgUploadStatusText">Memproses gambar...</span>
+                    </div>
+                    <div class="img-count-badge" id="imgCountBadge"></div>
                 </div>
 
                 <div class="form-row" style="margin-top: 16px;">
@@ -735,6 +762,12 @@
             "Ceritakan pengalaman atau pandangan pribadimu tentang suasana kelas secara jujur."
         ];
 
+        // Batas & pengaturan fitur gambar
+        const IMG_MAX_ORIGINAL_MB = 8;      // ukuran file asli maksimum yang diterima (sebelum kompresi)
+        const IMG_MAX_WIDTH_PX = 1000;      // lebar maksimum hasil kompresi
+        const IMG_JPEG_QUALITY = 0.72;      // kualitas kompresi JPEG
+        const IMG_MAX_COUNT = 6;            // maksimum jumlah gambar per jawaban
+
         // Retrieve Configurations from LocalStorage
         let gasUrl = localStorage.getItem("APP_GAS_URL") || "https://script.google.com/macros/s/AKfycbzUDDTELEPLEaH1vWvLXJ7LgR_mchgC2dw6wcb2ScKRVUfG9YcEIBZtwEoWh7aneQay/exec";
         const savedCustomQuestions = localStorage.getItem("APP_QUESTIONS");
@@ -766,148 +799,207 @@
                 dot.addEventListener('click', () => applyTheme(dot.getAttribute('data-theme')));
             });
 
-            // --- 2. QUILL EDITOR INITIALIZATION (SOURCE 3) ---
+            // --- 2. QUILL EDITOR INITIALIZATION ---
             quill = new Quill('#editor', {
-    theme: 'snow',
-
-    placeholder: 'Tuliskan jawaban atau cerita refleksi Anda di sini secara jujur...',
-
-    modules: {
-        toolbar: {
-            container: [
-                ['bold', 'italic', 'underline'],
-
-                [{ 'color': [] }, { 'background': [] }],
-
-                [
-                    { 'list': 'ordered' },
-                    { 'list': 'bullet' }
-                ],
-
-                // 🖼️ TOMBOL TAMBAH GAMBAR
-                ['image'],
-
-                ['clean']
-            ],
-
-            handlers: {
-                image: function () {
-                    pilihGambar();
+                theme: 'snow',
+                placeholder: 'Tuliskan jawaban atau cerita refleksi Anda di sini secara jujur...',
+                modules: {
+                    toolbar: {
+                        container: [
+                            ['bold', 'italic', 'underline'],
+                            [{ 'color': [] }, { 'background': [] }],
+                            [
+                                { 'list': 'ordered' },
+                                { 'list': 'bullet' }
+                            ],
+                            // 🖼️ TOMBOL TAMBAH GAMBAR
+                            ['image'],
+                            ['clean']
+                        ],
+                        handlers: {
+                            image: function () {
+                                pilihGambar();
+                            }
+                        }
+                    }
                 }
+            });
+
+            // Update jumlah gambar setiap kali konten editor berubah
+            quill.on('text-change', () => {
+                updateImageCountBadge();
+            });
+
+            // =====================================================
+            // FITUR TAMBAH GAMBAR (diperbaiki)
+            // - Mendukung banyak gambar sekaligus
+            // - Otomatis mengompres & mengubah ukuran gambar agar
+            //   payload tidak terlalu besar untuk dikirim/disimpan
+            // - Menampilkan status "memproses" & pesan error yang jelas
+            // - Membatasi jumlah gambar per jawaban
+            // =====================================================
+
+            const imgStatusEl = document.getElementById('imgUploadStatus');
+            const imgStatusTextEl = document.getElementById('imgUploadStatusText');
+
+            function setImgStatus(visible, text) {
+                if (text) imgStatusTextEl.textContent = text;
+                imgStatusEl.classList.toggle('active', !!visible);
             }
-        }
-    }
-});
 
+            function currentImageCountInEditor() {
+                return (quill.root.querySelectorAll('img') || []).length;
+            }
 
-// =====================================================
-// FITUR TAMBAH GAMBAR
-// =====================================================
+            function updateImageCountBadge() {
+                const count = currentImageCountInEditor();
+                const badge = document.getElementById('imgCountBadge');
+                badge.textContent = count > 0
+                    ? `${count} gambar terlampir (maks ${IMG_MAX_COUNT})`
+                    : '';
+            }
 
-function pilihGambar() {
+            function pilihGambar() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.multiple = true;
+                input.click();
 
-    const input = document.createElement('input');
+                input.onchange = async function () {
+                    const files = Array.from(input.files || []);
+                    if (!files.length) return;
 
-    input.type = 'file';
+                    const slotsLeft = IMG_MAX_COUNT - currentImageCountInEditor();
+                    if (slotsLeft <= 0) {
+                        alert(`Maksimal ${IMG_MAX_COUNT} gambar per jawaban. Hapus salah satu gambar di editor untuk menambah yang baru.`);
+                        return;
+                    }
 
-    input.accept = 'image/*';
+                    const filesToProcess = files.slice(0, slotsLeft);
+                    if (files.length > filesToProcess.length) {
+                        alert(`Hanya ${filesToProcess.length} gambar pertama yang diproses (batas maksimal ${IMG_MAX_COUNT} gambar tercapai).`);
+                    }
 
-    // Membuka galeri HP
-    input.click();
+                    setImgStatus(true, `Memproses gambar (0/${filesToProcess.length})...`);
+                    let done = 0;
+                    let failed = 0;
 
+                    for (const file of filesToProcess) {
+                        try {
+                            await processAndInsertImage(file);
+                        } catch (err) {
+                            console.warn('Gagal memproses gambar:', file.name, err);
+                            failed++;
+                        }
+                        done++;
+                        setImgStatus(true, `Memproses gambar (${done}/${filesToProcess.length})...`);
+                    }
 
-    input.onchange = function () {
+                    setImgStatus(false);
+                    updateImageCountBadge();
 
-        const file = input.files[0];
-
-        if (!file) return;
-
-
-        // Cek apakah file gambar
-        if (!file.type.startsWith('image/')) {
-
-            alert('File yang dipilih harus berupa gambar!');
-
-            return;
-        }
-
-
-        // Maksimal 2 MB
-        if (file.size > 2 * 1024 * 1024) {
-
-            alert('Ukuran gambar maksimal 2 MB.');
-
-            return;
-        }
-
-
-        const reader = new FileReader();
-
-
-        reader.onload = function (event) {
-
-            let range = quill.getSelection(true);
-
-
-            if (!range) {
-
-                range = {
-                    index: quill.getLength(),
-                    length: 0
+                    if (failed > 0) {
+                        alert(`${failed} dari ${filesToProcess.length} gambar gagal ditambahkan. Pastikan file berupa gambar (JPG/PNG/WebP) dan tidak rusak.`);
+                    }
                 };
-
             }
 
+            function processAndInsertImage(file) {
+                return new Promise((resolve, reject) => {
+                    if (!file.type.startsWith('image/')) {
+                        reject(new Error('Bukan file gambar: ' + file.name));
+                        return;
+                    }
 
-            // Masukkan gambar ke editor
-            quill.insertEmbed(
-                range.index,
-                'image',
-                event.target.result,
-                'user'
-            );
+                    if (file.size > IMG_MAX_ORIGINAL_MB * 1024 * 1024) {
+                        reject(new Error(`Ukuran "${file.name}" melebihi ${IMG_MAX_ORIGINAL_MB} MB.`));
+                        return;
+                    }
 
+                    const reader = new FileReader();
 
-            // Pindahkan kursor setelah gambar
-            quill.setSelection(
-                range.index + 1,
-                0
-            );
+                    reader.onerror = function () {
+                        reject(new Error('Gagal membaca file: ' + file.name));
+                    };
 
-        };
+                    reader.onload = function (event) {
+                        const img = new Image();
 
+                        img.onerror = function () {
+                            reject(new Error('File bukan gambar yang valid: ' + file.name));
+                        };
 
-        reader.readAsDataURL(file);
+                        img.onload = function () {
+                            try {
+                                const dataUrl = compressImage(img, IMG_MAX_WIDTH_PX, IMG_JPEG_QUALITY);
+                                insertImageToEditor(dataUrl);
+                                resolve();
+                            } catch (e) {
+                                reject(e);
+                            }
+                        };
 
-    };
+                        img.src = event.target.result;
+                    };
 
-}
+                    reader.readAsDataURL(file);
+                });
+            }
 
+            // Mengubah ukuran & mengompres gambar via canvas agar base64
+            // yang dihasilkan jauh lebih kecil (menghindari payload
+            // terlalu besar saat dikirim ke server atau disimpan offline).
+            function compressImage(imgEl, maxWidth, quality) {
+                const canvas = document.createElement('canvas');
+                let { width, height } = imgEl;
 
-// =====================================================
-// AGAR GAMBAR RESPONSIF
-// =====================================================
+                if (width > maxWidth) {
+                    height = Math.round(height * (maxWidth / width));
+                    width = maxWidth;
+                }
 
-const imageStyle = document.createElement('style');
+                canvas.width = width;
+                canvas.height = height;
 
-imageStyle.innerHTML = `
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(imgEl, 0, 0, width, height);
 
-    #editor img {
-        max-width: 100%;
-        height: auto;
-        display: block;
-        margin: 12px auto;
-        border-radius: 10px;
-    }
+                // Gunakan JPEG untuk kompresi lebih baik; latar putih
+                // ditambahkan dulu agar gambar PNG transparan tidak jadi hitam.
+                const ctx2d = ctx;
+                ctx2d.globalCompositeOperation = 'destination-over';
+                ctx2d.fillStyle = '#FFFFFF';
+                ctx2d.fillRect(0, 0, width, height);
 
-`;
+                return canvas.toDataURL('image/jpeg', quality);
+            }
 
-document.head.appendChild(imageStyle);
+            function insertImageToEditor(dataUrl) {
+                let range = quill.getSelection(true);
+                if (!range) {
+                    range = { index: quill.getLength(), length: 0 };
+                }
+                quill.insertEmbed(range.index, 'image', dataUrl, 'user');
+                quill.setSelection(range.index + 1, 0);
+            }
 
+            // Agar gambar responsif di dalam editor
+            const imageStyle = document.createElement('style');
+            imageStyle.innerHTML = `
+                #editor img {
+                    max-width: 100%;
+                    height: auto;
+                    display: block;
+                    margin: 12px auto;
+                    border-radius: 10px;
+                }
+            `;
+            document.head.appendChild(imageStyle);
 
-updateOfflineCount();
+            updateOfflineCount();
 
-            // --- 3. DYNAMIC QUESTIONS & GAS FETCH (SOURCE 2 & 3) ---
+            // --- 3. DYNAMIC QUESTIONS & GAS FETCH ---
             function renderQuestions() {
                 const listEl = document.getElementById('questionsList');
                 listEl.innerHTML = '';
@@ -919,14 +1011,12 @@ updateOfflineCount();
             }
 
             async function fetchQuestionsFromGAS() {
-              // Jika gasUrl kosong, langsung tampilkan pertanyaan lokal
               if (!gasUrl) {
                   renderQuestions();
                   return;
               }
-              
+
               try {
-                  // Menggunakan mode 'cors' dan penanganan timeout
                   const response = await fetch(gasUrl, { method: 'GET' });
                   if (response.ok) {
                       const result = await response.json();
@@ -936,11 +1026,9 @@ updateOfflineCount();
                   }
               } catch (error) {
                   console.warn("Koneksi ke Apps Script gagal/ditiadakan CORS, menggunakan soal default:", error);
-                  // Tampilkan indikator offline jika ada kendala
                   const badge = document.getElementById('offline-badge');
                   if (badge) badge.classList.remove('hidden');
               } finally {
-                  // PERBAIKAN UTAMA: Selalu panggil renderQuestions() apapun yang terjadi
                   renderQuestions();
               }
           }
@@ -979,6 +1067,7 @@ updateOfflineCount();
                 } else if (stepName === 'editor') {
                     stepEditor.classList.remove('hidden');
                     fetchQuestionsFromGAS();
+                    updateImageCountBadge();
                 } else if (stepName === 'success') {
                     stepSuccess.classList.remove('hidden');
                 }
@@ -1023,6 +1112,11 @@ updateOfflineCount();
                 }
 
                 try {
+                    // Catatan: mode 'no-cors' membuat respons bersifat "opaque",
+                    // sehingga fetch tidak akan melempar error walau request
+                    // sebenarnya gagal di sisi server (misal payload gambar
+                    // terlalu besar). Kompresi gambar di atas membantu
+                    // mengurangi risiko ini.
                     await fetch(gasUrl, {
                         method: 'POST',
                         mode: 'no-cors',
@@ -1043,6 +1137,7 @@ updateOfflineCount();
             btnResetForm.addEventListener('click', () => {
                 formIdentity.reset();
                 quill.setContents([]);
+                updateImageCountBadge();
                 modal.classList.remove('active');
             });
 
@@ -1059,11 +1154,18 @@ updateOfflineCount();
                 }
             }
 
+            // Disimpan dengan try/catch karena gambar (base64) dapat membuat
+            // ukuran data besar dan localStorage punya kuota terbatas (±5-10MB).
             function saveToLocalStorage(data) {
-                const existing = JSON.parse(localStorage.getItem("OFFLINE_DRAFTS") || "[]");
-                existing.push(data);
-                localStorage.setItem("OFFLINE_DRAFTS", JSON.stringify(existing));
-                updateOfflineCount();
+                try {
+                    const existing = JSON.parse(localStorage.getItem("OFFLINE_DRAFTS") || "[]");
+                    existing.push(data);
+                    localStorage.setItem("OFFLINE_DRAFTS", JSON.stringify(existing));
+                    updateOfflineCount();
+                } catch (e) {
+                    console.error("Gagal menyimpan draft offline (kemungkinan kapasitas penyimpanan penuh):", e);
+                    alert("Penyimpanan offline penuh, kemungkinan karena banyak gambar besar yang terlampir. Coba kurangi jumlah gambar pada jawaban, lalu kirim ulang.");
+                }
             }
 
             function updateOfflineCount() {
@@ -1071,7 +1173,7 @@ updateOfflineCount();
                 document.getElementById('offlineCount').innerText = existing.length;
             }
 
-            // --- 5. ADMIN CONTROL PANEL (SOURCE 3) ---
+            // --- 5. ADMIN CONTROL PANEL ---
             const adminModal = document.getElementById('adminModal');
             const btnOpenAdmin = document.getElementById('btnOpenAdmin');
             const btnCloseAdminModal = document.getElementById('btnCloseAdminModal');
