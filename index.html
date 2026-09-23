@@ -14,9 +14,7 @@
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
     <style>
-        /* =========================================================
-           1. THEMING VARIABLES & CSS SYSTEM (SOURCE 2)
-           ========================================================= */
+        /* Warna dan tema */
         :root {
             --bg-main: #0B1120;
             --card-bg: #32372f;
@@ -121,9 +119,7 @@
             --glow-color: rgba(245, 158, 11, 0.2);
         }
 
-        /* =========================================================
-           2. BASE STYLES & LAYOUT
-           ========================================================= */
+        /* Layout dasar */
         * {
             margin: 0;
             padding: 0;
@@ -335,9 +331,7 @@
             100% { opacity: 0.4; }
         }
 
-        /* =========================================================
-           3. MODALS & QUILL EDITOR STYLES
-           ========================================================= */
+        /* Modal dan editor */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -477,7 +471,7 @@
             margin-top: 3px;
         }
 
-        /* Quill Editor Styling Override */
+        /* Tampilan editor */
         .ql-toolbar.ql-snow {
             background: var(--card-inner);
             border-color: var(--border-color) !important;
@@ -499,7 +493,7 @@
         .ql-snow .ql-fill { fill: var(--text-body); }
         .ql-snow .ql-picker { color: var(--text-body); }
 
-        /* Image upload status indicator */
+        /* Status upload gambar */
         .img-upload-status {
             display: none;
             align-items: center;
@@ -522,9 +516,97 @@
             margin-top: 4px;
         }
 
-        /* =========================================================
-           4. FOOTER & ADMIN CONTROL
-           ========================================================= */
+        /* Voice note */
+        .voice-box {
+            background: var(--card-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-top: 14px;
+            text-align: left;
+        }
+
+        .voice-box-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-heading);
+            margin-bottom: 10px;
+        }
+
+        .voice-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-voice {
+            background: var(--primary-accent);
+            color: #fff;
+            border: none;
+            padding: 9px 14px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .btn-voice.recording {
+            background: #EF4444;
+            animation: pulse 1.2s infinite;
+        }
+
+        .btn-voice:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .voice-timer {
+            font-size: 0.85rem;
+            color: var(--text-body);
+            font-variant-numeric: tabular-nums;
+            min-width: 46px;
+        }
+
+        .voice-note-limit {
+            font-size: 0.75rem;
+            color: var(--text-body);
+            margin-top: 6px;
+        }
+
+        .voice-preview {
+            display: none;
+            margin-top: 10px;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .voice-preview.active { display: flex; }
+
+        .voice-preview audio {
+            flex: 1;
+            min-width: 180px;
+            height: 34px;
+        }
+
+        .btn-voice-remove {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-body);
+            border-radius: 8px;
+            padding: 7px 10px;
+            font-size: 0.78rem;
+            cursor: pointer;
+        }
+
+        /* Footer dan panel admin */
         footer {
             display: flex;
             justify-content: space-between;
@@ -561,7 +643,7 @@
 
     <div class="top-bar-line"></div>
 
-    <!-- Header Navbar -->
+    <!-- Header -->
     <header>
         <div class="brand">
             <i class="fa-solid fa-wand-magic-sparkles"></i>
@@ -583,10 +665,10 @@
         </div>
     </header>
 
-    <!-- Main Section -->
+    <!-- Konten utama -->
     <main>
         <div class="card-container">
-            <!-- Offline Indicator Badge -->
+            <!-- Status offline -->
             <div id="offline-badge" class="offline-badge hidden">
                 <span class="offline-dot"></span> Mode Penyimpanan Lokal (Offline)
             </div>
@@ -611,7 +693,7 @@
         </div>
     </main>
 
-    <!-- Modal Form Refleksi Multi-Step -->
+    <!-- Form refleksi -->
     <div class="modal-overlay" id="reflectionModal">
         <div class="modal-card">
             <div class="modal-header">
@@ -619,7 +701,7 @@
                 <button class="btn-close" id="btnCloseModal"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <!-- STEP 1: IDENTITAS SISWA -->
+            <!-- Identitas -->
             <div id="step-identity">
                 <div class="guarantee-box" style="margin-bottom: 16px; background: rgba(99, 102, 241, 0.08);">
                     <p class="guarantee-text" style="font-size: 0.83rem;">
@@ -643,7 +725,7 @@
                 </form>
             </div>
 
-            <!-- STEP 2: PERTANYAAN & RICH TEXT EDITOR -->
+            <!-- Pertanyaan dan jawaban -->
             <div id="step-editor" class="hidden">
                 <div class="questions-box">
                     <div class="questions-header">
@@ -665,6 +747,28 @@
                         <span id="imgUploadStatusText">Memproses gambar...</span>
                     </div>
                     <div class="img-count-badge" id="imgCountBadge"></div>
+
+                    <!-- Voice note -->
+                    <div class="voice-box">
+                        <div class="voice-box-header">
+                            <i class="fa-solid fa-microphone-lines"></i>
+                            <span>Voice Note</span>
+                        </div>
+                        <div class="voice-controls">
+                            <button type="button" id="btnVoiceRecord" class="btn-voice">
+                                <i class="fa-solid fa-microphone" id="voiceBtnIcon"></i>
+                                <span id="voiceBtnText">Mulai Rekam</span>
+                            </button>
+                            <span class="voice-timer" id="voiceTimer">00:00</span>
+                        </div>
+                        <div class="voice-note-limit" id="voiceHint">Klik "Mulai Rekam" lalu ceritakan sebebas dan selama yang kamu butuhkan. Klik lagi untuk berhenti.</div>
+                        <div class="voice-preview" id="voicePreview">
+                            <audio id="voiceAudioPlayer" controls></audio>
+                            <button type="button" id="btnVoiceRemove" class="btn-voice-remove">
+                                <i class="fa-solid fa-trash"></i> Hapus
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-row" style="margin-top: 16px;">
@@ -678,7 +782,7 @@
                 </div>
             </div>
 
-            <!-- STEP 3: SUCCESS STATE -->
+            <!-- Selesai -->
             <div id="step-success" class="hidden" style="text-align: center; padding: 20px 0;">
                 <div style="font-size: 3rem; color: #10B981; margin-bottom: 12px;">
                     <i class="fa-solid fa-circle-check"></i>
@@ -694,7 +798,7 @@
         </div>
     </div>
 
-    <!-- Modal Admin Control Panel -->
+    <!-- Panel admin -->
     <div class="modal-overlay" id="adminModal">
         <div class="modal-card" style="max-width: 450px;">
             <div class="modal-header">
@@ -702,7 +806,7 @@
                 <button class="btn-close" id="btnCloseAdminModal"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <!-- Admin Authentication -->
+            <!-- Login admin -->
             <div id="adminAuth">
                 <div class="form-group">
                     <label for="adminPin">Masukkan PIN Keamanan Guru:</label>
@@ -713,7 +817,7 @@
                 </button>
             </div>
 
-            <!-- Admin Settings Panel -->
+            <!-- Pengaturan admin -->
             <div id="adminPanel" class="hidden">
                 <div class="form-group">
                     <label for="cfgGasUrl">URL Google Apps Script (Web App):</label>
@@ -751,9 +855,7 @@
         </div>
     </footer>
 
-    <!-- =========================================================
-       5. INTEGRATED JAVASCRIPT LOGIC
-       ========================================================= -->
+    <!-- Script utama -->
     <script>
         const DEFAULT_PIN = "1234";
         let quill = null;
@@ -762,13 +864,23 @@
             "Ceritakan pengalaman atau pandangan pribadimu tentang suasana kelas secara jujur."
         ];
 
-        // Batas & pengaturan fitur gambar
+        // Pengaturan gambar
         const IMG_MAX_ORIGINAL_MB = 8;      // ukuran file asli maksimum yang diterima (sebelum kompresi)
         const IMG_MAX_WIDTH_PX = 1000;      // lebar maksimum hasil kompresi
         const IMG_JPEG_QUALITY = 0.72;      // kualitas kompresi JPEG
         const IMG_MAX_COUNT = 6;            // maksimum jumlah gambar per jawaban
 
-        // Retrieve Configurations from LocalStorage
+        // Data voice note
+        let mediaRecorder = null;
+        let mediaStream = null;
+        let voiceChunks = [];
+        let voiceBase64 = null;
+        let voiceMimeType = null;
+        let isRecordingVoice = false;
+        let voiceTimerInterval = null;
+        let voiceSecondsElapsed = 0;
+
+        // Ambil pengaturan tersimpan
         let gasUrl = localStorage.getItem("APP_GAS_URL") || "https://script.google.com/macros/s/AKfycbzUDDTELEPLEaH1vWvLXJ7LgR_mchgC2dw6wcb2ScKRVUfG9YcEIBZtwEoWh7aneQay/exec";
         const savedCustomQuestions = localStorage.getItem("APP_QUESTIONS");
         if (savedCustomQuestions) {
@@ -776,7 +888,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // --- 1. THEME SWITCHER LOGIC (SOURCE 2) ---
+            // Ganti tema
             const colorDots = document.querySelectorAll('.color-dot');
             const htmlElement = document.documentElement;
 
@@ -799,7 +911,7 @@
                 dot.addEventListener('click', () => applyTheme(dot.getAttribute('data-theme')));
             });
 
-            // --- 2. QUILL EDITOR INITIALIZATION ---
+            // Editor jawaban
             quill = new Quill('#editor', {
                 theme: 'snow',
                 placeholder: 'Tuliskan jawaban atau cerita refleksi Anda di sini secara jujur...',
@@ -812,7 +924,7 @@
                                 { 'list': 'ordered' },
                                 { 'list': 'bullet' }
                             ],
-                            // 🖼️ TOMBOL TAMBAH GAMBAR
+                            // Tombol gambar
                             ['image'],
                             ['clean']
                         ],
@@ -825,19 +937,12 @@
                 }
             });
 
-            // Update jumlah gambar setiap kali konten editor berubah
+            // Update jumlah gambar
             quill.on('text-change', () => {
                 updateImageCountBadge();
             });
 
-            // =====================================================
-            // FITUR TAMBAH GAMBAR (diperbaiki)
-            // - Mendukung banyak gambar sekaligus
-            // - Otomatis mengompres & mengubah ukuran gambar agar
-            //   payload tidak terlalu besar untuk dikirim/disimpan
-            // - Menampilkan status "memproses" & pesan error yang jelas
-            // - Membatasi jumlah gambar per jawaban
-            // =====================================================
+            // Upload gambar
 
             const imgStatusEl = document.getElementById('imgUploadStatus');
             const imgStatusTextEl = document.getElementById('imgUploadStatusText');
@@ -947,9 +1052,7 @@
                 });
             }
 
-            // Mengubah ukuran & mengompres gambar via canvas agar base64
-            // yang dihasilkan jauh lebih kecil (menghindari payload
-            // terlalu besar saat dikirim ke server atau disimpan offline).
+            // Kompres gambar sebelum dimasukkan ke editor
             function compressImage(imgEl, maxWidth, quality) {
                 const canvas = document.createElement('canvas');
                 let { width, height } = imgEl;
@@ -965,8 +1068,7 @@
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(imgEl, 0, 0, width, height);
 
-                // Gunakan JPEG untuk kompresi lebih baik; latar putih
-                // ditambahkan dulu agar gambar PNG transparan tidak jadi hitam.
+                // Tambahkan latar putih untuk gambar transparan
                 const ctx2d = ctx;
                 ctx2d.globalCompositeOperation = 'destination-over';
                 ctx2d.fillStyle = '#FFFFFF';
@@ -984,7 +1086,7 @@
                 quill.setSelection(range.index + 1, 0);
             }
 
-            // Agar gambar responsif di dalam editor
+            // Gambar tetap responsif
             const imageStyle = document.createElement('style');
             imageStyle.innerHTML = `
                 #editor img {
@@ -999,7 +1101,158 @@
 
             updateOfflineCount();
 
-            // --- 3. DYNAMIC QUESTIONS & GAS FETCH ---
+            // Voice note
+
+            const btnVoiceRecord = document.getElementById('btnVoiceRecord');
+            const voiceBtnIcon = document.getElementById('voiceBtnIcon');
+            const voiceBtnText = document.getElementById('voiceBtnText');
+            const voiceTimerEl = document.getElementById('voiceTimer');
+            const voicePreviewEl = document.getElementById('voicePreview');
+            const voiceAudioPlayer = document.getElementById('voiceAudioPlayer');
+            const btnVoiceRemove = document.getElementById('btnVoiceRemove');
+            const voiceHintEl = document.getElementById('voiceHint');
+
+            function formatTimer(totalSeconds) {
+                const mm = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+                const ss = String(totalSeconds % 60).padStart(2, '0');
+                return `${mm}:${ss}`;
+            }
+
+            function pickSupportedMimeType() {
+                const candidates = [
+                    'audio/webm;codecs=opus',
+                    'audio/webm',
+                    'audio/ogg;codecs=opus',
+                    'audio/mp4'
+                ];
+                for (const type of candidates) {
+                    if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(type)) {
+                        return type;
+                    }
+                }
+                return '';
+            }
+
+            async function startVoiceRecording() {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
+                    alert('Perangkat/browser ini tidak mendukung perekaman suara. Coba gunakan Chrome atau Firefox versi terbaru.');
+                    return;
+                }
+
+                try {
+                    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                } catch (err) {
+                    console.warn('Gagal mengakses mikrofon:', err);
+                    alert('Tidak bisa mengakses mikrofon. Pastikan kamu mengizinkan akses mikrofon pada browser.');
+                    return;
+                }
+
+                voiceChunks = [];
+                const mimeType = pickSupportedMimeType();
+                try {
+                    mediaRecorder = mimeType
+                        ? new MediaRecorder(mediaStream, { mimeType })
+                        : new MediaRecorder(mediaStream);
+                } catch (err) {
+                    console.warn('Gagal membuat MediaRecorder:', err);
+                    alert('Perekaman suara tidak dapat dimulai di perangkat ini.');
+                    stopMediaStreamTracks();
+                    return;
+                }
+
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data && e.data.size > 0) voiceChunks.push(e.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    stopMediaStreamTracks();
+
+                    if (!voiceChunks.length) return;
+
+                    const blob = new Blob(voiceChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+                    voiceMimeType = blob.type;
+
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        // Ambil isi base64
+                        const result = reader.result;
+                        const commaIdx = result.indexOf(',');
+                        voiceBase64 = commaIdx >= 0 ? result.slice(commaIdx + 1) : result;
+
+                        const objectUrl = URL.createObjectURL(blob);
+                        voiceAudioPlayer.src = objectUrl;
+                        voicePreviewEl.classList.add('active');
+                        voiceHintEl.textContent = `Rekaman tersimpan (${formatTimer(voiceSecondsElapsed)}). Kamu bisa merekam ulang atau menghapusnya.`;
+                    };
+                    reader.readAsDataURL(blob);
+                };
+
+                mediaRecorder.start();
+                isRecordingVoice = true;
+                voiceSecondsElapsed = 0;
+                voiceTimerEl.textContent = formatTimer(0);
+
+                // Timer durasi rekaman
+                voiceTimerInterval = setInterval(() => {
+                    voiceSecondsElapsed++;
+                    voiceTimerEl.textContent = formatTimer(voiceSecondsElapsed);
+                }, 1000);
+
+                btnVoiceRecord.classList.add('recording');
+                voiceBtnIcon.className = 'fa-solid fa-stop';
+                voiceBtnText.textContent = 'Berhenti Rekam';
+                voiceHintEl.textContent = 'Sedang merekam... ceritakan sepuasnya, klik lagi untuk berhenti kapan saja.';
+                voicePreviewEl.classList.remove('active');
+            }
+
+            function stopVoiceRecording() {
+                if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                    mediaRecorder.stop();
+                }
+                isRecordingVoice = false;
+                clearInterval(voiceTimerInterval);
+                voiceTimerInterval = null;
+
+                btnVoiceRecord.classList.remove('recording');
+                voiceBtnIcon.className = 'fa-solid fa-microphone';
+                voiceBtnText.textContent = 'Mulai Rekam';
+            }
+
+            function stopMediaStreamTracks() {
+                if (mediaStream) {
+                    mediaStream.getTracks().forEach(track => track.stop());
+                    mediaStream = null;
+                }
+            }
+
+            function resetVoiceNote() {
+                if (isRecordingVoice) stopVoiceRecording();
+                voiceBase64 = null;
+                voiceMimeType = null;
+                voiceSecondsElapsed = 0;
+                voiceChunks = [];
+                voiceAudioPlayer.pause();
+                voiceAudioPlayer.removeAttribute('src');
+                voiceAudioPlayer.load();
+                voicePreviewEl.classList.remove('active');
+                voiceTimerEl.textContent = '00:00';
+                voiceHintEl.textContent = 'Klik "Mulai Rekam" lalu ceritakan sebebas dan selama yang kamu butuhkan. Klik lagi untuk berhenti.';
+            }
+
+            btnVoiceRecord.addEventListener('click', () => {
+                if (isRecordingVoice) {
+                    stopVoiceRecording();
+                } else {
+                    // Rekam ulang mengganti rekaman lama
+                    startVoiceRecording();
+                }
+            });
+
+            btnVoiceRemove.addEventListener('click', () => {
+                resetVoiceNote();
+            });
+
+            // Ambil pertanyaan
             function renderQuestions() {
                 const listEl = document.getElementById('questionsList');
                 listEl.innerHTML = '';
@@ -1033,7 +1286,7 @@
               }
           }
 
-            // --- 4. STEP MODAL NAVIGATION & SUBMISSION ---
+            // Navigasi form dan pengiriman
             const modal = document.getElementById('reflectionModal');
             const btnStart = document.getElementById('btnStart');
             const btnIcon = document.getElementById('btnIcon');
@@ -1080,15 +1333,20 @@
 
             btnBackToIdentity.addEventListener('click', () => showStep('identity'));
 
-            // Submit Handler (Online GAS + Offline LocalStorage Fallback)
+            // Kirim jawaban
             btnSubmitAnswer.addEventListener('click', async () => {
                 const nama = document.getElementById('nama').value.trim();
                 const kelas = document.getElementById('kelas').value.trim();
                 const rawText = quill.getText().trim();
                 const htmlAnswer = quill.root.innerHTML;
 
-                if (!rawText || rawText.length < 2) {
-                    alert("Mohon isi jawaban atau cerita refleksi Anda terlebih dahulu.");
+                if (isRecordingVoice) {
+                    alert('Voice note masih sedang merekam. Klik "Berhenti Rekam" terlebih dahulu sebelum mengirim.');
+                    return;
+                }
+
+                if ((!rawText || rawText.length < 2) && !voiceBase64) {
+                    alert("Mohon isi jawaban tertulis atau rekam voice note terlebih dahulu.");
                     return;
                 }
 
@@ -1098,6 +1356,9 @@
                     nama: nama,
                     kelas: kelas,
                     jawaban_html: htmlAnswer,
+                    voice_note_base64: voiceBase64 || null,
+                    voice_note_mime: voiceMimeType || null,
+                    voice_note_duration_sec: voiceBase64 ? voiceSecondsElapsed : null,
                     timestamp: new Date().toLocaleString('id-ID'),
                     user_agent: navigator.userAgent
                 };
@@ -1112,11 +1373,7 @@
                 }
 
                 try {
-                    // Catatan: mode 'no-cors' membuat respons bersifat "opaque",
-                    // sehingga fetch tidak akan melempar error walau request
-                    // sebenarnya gagal di sisi server (misal payload gambar
-                    // terlalu besar). Kompresi gambar di atas membantu
-                    // mengurangi risiko ini.
+                    // Kirim ke Google Apps Script
                     await fetch(gasUrl, {
                         method: 'POST',
                         mode: 'no-cors',
@@ -1138,6 +1395,7 @@
                 formIdentity.reset();
                 quill.setContents([]);
                 updateImageCountBadge();
+                resetVoiceNote();
                 modal.classList.remove('active');
             });
 
@@ -1154,8 +1412,7 @@
                 }
             }
 
-            // Disimpan dengan try/catch karena gambar (base64) dapat membuat
-            // ukuran data besar dan localStorage punya kuota terbatas (±5-10MB).
+            // Simpan sementara jika pengiriman online gagal
             function saveToLocalStorage(data) {
                 try {
                     const existing = JSON.parse(localStorage.getItem("OFFLINE_DRAFTS") || "[]");
@@ -1164,7 +1421,7 @@
                     updateOfflineCount();
                 } catch (e) {
                     console.error("Gagal menyimpan draft offline (kemungkinan kapasitas penyimpanan penuh):", e);
-                    alert("Penyimpanan offline penuh, kemungkinan karena banyak gambar besar yang terlampir. Coba kurangi jumlah gambar pada jawaban, lalu kirim ulang.");
+                    alert("Penyimpanan offline penuh, kemungkinan karena gambar/voice note yang berukuran besar. Coba kurangi jumlah gambar atau perpendek voice note, lalu kirim ulang.");
                 }
             }
 
@@ -1173,7 +1430,7 @@
                 document.getElementById('offlineCount').innerText = existing.length;
             }
 
-            // --- 5. ADMIN CONTROL PANEL ---
+            // Panel admin
             const adminModal = document.getElementById('adminModal');
             const btnOpenAdmin = document.getElementById('btnOpenAdmin');
             const btnCloseAdminModal = document.getElementById('btnCloseAdminModal');
